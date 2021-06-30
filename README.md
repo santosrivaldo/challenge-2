@@ -1,4 +1,4 @@
-# Test Web 1
+# Challenge 2
 
 The idea with this test is to allow us to better comprehend the skills of candidates to developer jobs, in various experience levels.
 
