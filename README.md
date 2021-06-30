@@ -23,7 +23,7 @@ Throu the web interface, you will need to:
 - List the user's virtual wallet entries ordered by date and time.
 
 You will also need to create three API endpoints to:
-- Credit or debit money to user's wallet;
+- Credit or debit money to the user's virtual wallet;
 - Retrieve an user's virtual wallet current balance;
 - Retrieve an user's virtual wallet entries in a period of time.
 
