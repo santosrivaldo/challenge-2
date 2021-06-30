@@ -46,7 +46,8 @@ Your project will be evaluated by the following criteria:
 
 - Does the application fulfill the basic requirements?
 - Did you document how to configure and run the application?
+- Did you provide API documentation?
 - Did you follow closely the project specification?
-- Quality of the code itself, how it's strutured and how it complies with good object-oriented practices;
-- Quality and coverage of unit / funcional / automated tests;
-- Familiarity with the standard libraries of the language and other packages;
+- Quality of the code itself, how it's strutured and how it complies with good object-oriented practices
+- Quality and coverage of unit / funcional / automated tests
+- Familiarity with the standard libraries of the language and other packages
