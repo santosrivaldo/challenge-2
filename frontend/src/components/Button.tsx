@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { cn } from '../lib/cn'
 import { Spinner } from './Spinner'
 
@@ -10,6 +11,8 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: ButtonSize
   loading?: boolean
   children: ReactNode
+  /** When set, renders a React Router link styled as a button. */
+  to?: string
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
@@ -27,23 +30,42 @@ const sizeStyles: Record<ButtonSize, string> = {
 }
 
 export function Button({
+  to,
   variant = 'primary',
   size = 'md',
   loading,
   disabled,
   className,
   children,
+  type,
   ...props
 }: ButtonProps) {
+  const classes = cn(
+    'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed',
+    variantStyles[variant],
+    sizeStyles[size],
+    className,
+  )
+
+  if (to) {
+    return (
+      <Link
+        to={to}
+        className={cn(
+          classes,
+          (disabled || loading) && 'pointer-events-none opacity-50',
+        )}
+        aria-disabled={disabled || loading ? true : undefined}
+      >
+        {children}
+      </Link>
+    )
+  }
+
   return (
     <button
-      type="button"
-      className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed',
-        variantStyles[variant],
-        sizeStyles[size],
-        className,
-      )}
+      type={type ?? 'button'}
+      className={classes}
       disabled={disabled || loading}
       {...props}
     >
