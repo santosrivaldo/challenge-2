@@ -2,6 +2,7 @@ import type {
   CreateUserInput,
   PostTransactionInput,
   Transaction,
+  TransactionDateRange,
   UserDetail,
   UserListItem,
 } from '../types/wallet'
@@ -191,3 +192,45 @@ export async function postTransaction(
   users = users.map((u, i) => (i === idx ? updated : u))
   return { balance: newBalance }
 }
+
+function startOfUtcDay(yyyyMmDd: string): number {
+  return new Date(`${yyyyMmDd}T00:00:00.000Z`).getTime()
+}
+
+function endOfUtcDay(yyyyMmDd: string): number {
+  return new Date(`${yyyyMmDd}T23:59:59.999Z`).getTime()
+}
+
+/**
+ * Mock: wallet entries for a user with optional date bounds (UTC day edges).
+ */
+export async function listTransactions(
+  userId: string,
+  range?: TransactionDateRange,
+): Promise<Transaction[]> {
+  await delay()
+  const idx = findUserIndex(userId)
+  if (idx === -1) throw new Error('User not found')
+
+  const fromMs =
+    range?.from && range.from.trim() !== ''
+      ? startOfUtcDay(range.from.trim())
+      : null
+  const toMs =
+    range?.to && range.to.trim() !== ''
+      ? endOfUtcDay(range.to.trim())
+      : null
+
+  const list = users[idx].transactions.filter((t) => {
+    const tMs = new Date(t.occurredAt).getTime()
+    if (fromMs !== null && tMs < fromMs) return false
+    if (toMs !== null && tMs > toMs) return false
+    return true
+  })
+
+  return [...list].sort(
+    (a, b) =>
+      new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime(),
+  )
+}
+
