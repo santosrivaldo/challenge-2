@@ -1,0 +1,105 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: docker/db/Dockerfile
+    environment:
+      POSTGRES_USER: wallet
+      POSTGRES_PASSWORD: wallet_challenge_dev
+      POSTGRES_DB: wallet_app_production
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wallet -d wallet_app_production"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks:
+      - app
+
+  web:
+    image: walletapp-web:latest
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+    environment:
+      RAILS_ENV: production
+      RACK_ENV: production
+      DATABASE_URL: postgres://wallet:wallet_challenge_dev@db:5432/wallet_app_production
+      DB_HOST: db
+      DB_PORT: "5432"
+      POSTGRES_USER: wallet
+      POSTGRES_PASSWORD: wallet_challenge_dev
+      POSTGRES_DB: wallet_app_production
+      SECRET_KEY_BASE: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      RAILS_LOG_TO_STDOUT: "1"
+      RAILS_SERVE_STATIC_FILES: "1"
+      FORCE_SSL: "false"
+      ASSUME_SSL: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app
+
+  proxy:
+    build:
+      context: .
+      dockerfile: docker/proxy/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - web
+    networks:
+      - app
+
+  ci:
+    profiles: ["ci"]
+    image: walletapp-ci:latest
+    build:
+      context: .
+      dockerfile: docker/ci/Dockerfile
+    environment:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://wallet:wallet_challenge_dev@db:5432/wallet_app_test
+      DB_HOST: db
+      DB_PORT: "5432"
+      POSTGRES_USER: wallet
+      POSTGRES_PASSWORD: wallet_challenge_dev
+      CI_DATABASE_NAME: wallet_app_test
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app
+
+  cd:
+    profiles: ["cd"]
+    image: walletapp-web:latest
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+    environment:
+      RAILS_ENV: production
+      RACK_ENV: production
+      DATABASE_URL: postgres://wallet:wallet_challenge_dev@db:5432/wallet_app_production
+      DB_HOST: db
+      DB_PORT: "5432"
+      POSTGRES_USER: wallet
+      POSTGRES_PASSWORD: wallet_challenge_dev
+      POSTGRES_DB: wallet_app_production
+      SECRET_KEY_BASE: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      RAILS_LOG_TO_STDOUT: "1"
+    entrypoint: ["/bin/sh", "-c", "bundle exec rails db:migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app
+
+volumes:
+  pgdata:
+
+networks:
+  app:
+    driver: bridge
