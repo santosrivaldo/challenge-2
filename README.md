@@ -15,6 +15,7 @@ Your job is create an application to manage users and their respective virtual w
 Each user has one virtual wallet. Each virtual wallet has multiple entries for credits and debits.
 
 Throu the web interface, you will need to:
+
 - List users;
 - Add a new user;
 - Edit an existing user;
@@ -23,11 +24,13 @@ Throu the web interface, you will need to:
 - List the user's virtual wallet entries ordered by date and time.
 
 You will also need to create three API endpoints to:
+
 - Credit or debit money to the user's virtual wallet;
 - Retrieve an user's virtual wallet current balance;
 - Retrieve an user's virtual wallet entries in a period of time.
 
 Your application MUST:
+
 - Be written in Ruby 2.4 or greater;
 - Be written in Rails 5.2 or greater;
 - Use a relational database such as PostgreSQL, MySQL or SQLite;
@@ -51,3 +54,69 @@ Your project will be evaluated by the following criteria:
 - Quality of the code itself, how it's strutured and how it complies with good object-oriented practices
 - Quality and coverage of unit / funcional / automated tests
 - Familiarity with the standard libraries of the language and other packages
+
+---
+
+## Implementação (WalletApp)
+
+Aplicação Rails 7 + PostgreSQL, MVC com serviços para operações na carteira, testes Minitest e empacotamento com **Docker Compose** (app, banco e **Nginx** na entrada).
+
+### Requisitos
+
+- Ruby **>= 3.1** e Bundler (execução local), ou apenas **Docker Desktop** (Linux containers).
+- PostgreSQL acessível nas portas configuradas em desenvolvimento.
+
+### Documentação da API
+
+Consulte [docs/API.md](docs/API.md) para os três endpoints JSON com exemplos `curl`.
+
+### Executar com Docker Compose
+
+1. Na raiz do projeto: `docker compose up --build` (credenciais de desenvolvimento já estão definidas em [docker-compose.yml](docker-compose.yml); **altere-as antes de qualquer ambiente exposto à Internet**).
+2. A interface web e a API ficam atrás do proxy em **http://localhost:8080**.
+3. Migrações e `db:prepare` são executadas pelo entrypoint do serviço `web` após o Postgres ficar saudável.
+
+Para personalizar variáveis, copie [.env.example](.env.example) para `.env`, ajuste os valores e use `docker compose --env-file .env up --build` (requer alinhar substituições no `docker-compose.yml` ou duplicar as chaves em `environment:`).
+
+Para popular dados de exemplo: `docker compose exec web bundle exec rails db:seed`.
+
+### CI/CD no Docker Compose
+
+Serviços adicionais (perfis Compose) para encaixar num pipeline sem alterar o arranque normal (`docker compose up` continua a subir apenas `db`, `web` e `proxy`).
+
+| Serviço | Perfil | Função |
+|---------|--------|--------|
+| `ci` | `ci` | Imagem [docker/ci/Dockerfile](docker/ci/Dockerfile), espera o Postgres, corre `db:test:prepare` e a suíte Minitest contra `wallet_app_test`. A base de testes é criada no primeiro arranque do volume via [docker/db/init/01-wallet_test.sql](docker/db/init/01-wallet_test.sql). |
+| `cd` | `cd` | Reutiliza a imagem `walletapp-web`, executa `bundle exec rails db:migrate` na base de produção (passo de “deploy” de esquema após build). |
+
+Exemplos:
+
+```bash
+docker compose --profile ci run --rm ci
+docker compose --profile cd run --rm cd
+```
+
+Se o volume `pgdata` já existia antes deste script de init, apague o volume ou crie manualmente a base `wallet_app_test` para o serviço `ci`.
+
+### Executar localmente (sem Docker)
+
+1. Crie bases `wallet_app_development` e `wallet_app_test` no PostgreSQL.
+2. `bundle install`
+3. `bin/rails db:prepare`
+4. `bin/rails server` e aceda a http://localhost:3000
+
+Variáveis úteis: `DB_HOST`, `DB_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` (ver [config/database.yml](config/database.yml)).
+
+### Testes
+
+```bash
+RAILS_ENV=test bin/rails db:test:prepare
+bin/rails test
+```
+
+### Estrutura relevante
+
+- Modelos: `User`, `Wallet`, `WalletEntry`
+- Serviço: `Wallets::CreditDebitService` (transação com `lock` na carteira)
+- API: `app/controllers/api/v1/users/wallets_controller.rb`
+- Interface web: `UsersController` e vistas em `app/views/users`
