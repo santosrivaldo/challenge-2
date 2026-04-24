@@ -36,7 +36,9 @@ export function useTransactions(
   }, [userId, range.from, range.to])
 
   useEffect(() => {
-    void refetch()
+    queueMicrotask(() => {
+      void refetch()
+    })
   }, [refetch])
 
   return { rows, loading, error, refetch }

@@ -34,7 +34,9 @@ export function useUsers() {
   }, [debouncedSearch])
 
   useEffect(() => {
-    void refetch()
+    queueMicrotask(() => {
+      void refetch()
+    })
   }, [refetch])
 
   const create = useCallback(async (input: CreateUserInput) => {

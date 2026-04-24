@@ -27,7 +27,9 @@ export function useUser(userId: string | undefined) {
   }, [userId])
 
   useEffect(() => {
-    void refetch()
+    queueMicrotask(() => {
+      void refetch()
+    })
   }, [refetch])
 
   return { user, loading, error, refetch }

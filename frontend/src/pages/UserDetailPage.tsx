@@ -13,9 +13,11 @@ export function UserDetailPage() {
   const { user, loading, error, refetch } = useUser(id)
   const [modalOpen, setModalOpen] = useState(false)
   const [modalKind, setModalKind] = useState<TransactionKind>('credit')
+  const [modalNonce, setModalNonce] = useState(0)
 
   function openModal(kind: TransactionKind) {
     setModalKind(kind)
+    setModalNonce((n) => n + 1)
     setModalOpen(true)
   }
 
@@ -92,6 +94,7 @@ export function UserDetailPage() {
           </div>
 
           <TransactionModal
+            key={`${user.id}-${modalNonce}`}
             open={modalOpen}
             userId={user.id}
             defaultKind={modalKind}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import type { TransactionKind } from '../types/wallet'
 import { postTransaction } from '../services/walletApi'
@@ -25,13 +25,6 @@ export function TransactionModal({
   const [amount, setAmount] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!open) return
-    setKind(defaultKind)
-    setAmount('')
-    setFormError(null)
-  }, [open, defaultKind])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
