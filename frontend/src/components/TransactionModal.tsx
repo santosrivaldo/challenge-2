@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import type { TransactionKind } from '../types/wallet'
 import { postTransaction } from '../services/walletApi'
 import { Button } from './Button'
@@ -38,12 +39,14 @@ export function TransactionModal({
     setSubmitting(true)
     try {
       const { balance } = await postTransaction(userId, { kind, amount })
+      toast.success(`Transaction saved. New balance: ${balance}`)
       onCompleted(balance)
       onClose()
     } catch (err) {
-      setFormError(
-        err instanceof Error ? err.message : 'Transaction failed',
-      )
+      const msg =
+        err instanceof Error ? err.message : 'Transaction failed'
+      setFormError(msg)
+      toast.error(msg)
     } finally {
       setSubmitting(false)
     }
