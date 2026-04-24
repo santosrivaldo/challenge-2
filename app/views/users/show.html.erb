@@ -1,0 +1,53 @@
+<h1><%= @user.name %></h1>
+
+<p><strong>E-mail:</strong> <%= @user.email %></p>
+
+<% if @wallet %>
+  <h2>Carteira virtual</h2>
+  <p><strong>Saldo atual:</strong> <%= number_to_currency(@wallet.balance, unit: "R$ ", separator: ",", delimiter: ".") %></p>
+
+  <h3>Crédito / débito</h3>
+  <%= form_with url: wallet_transaction_user_path(@user), method: :post do %>
+    <div>
+      <label for="kind">Tipo</label>
+      <select name="kind" id="kind">
+        <option value="credit">Crédito</option>
+        <option value="debit">Débito</option>
+      </select>
+    </div>
+    <div>
+      <label for="amount">Valor</label>
+      <input type="number" name="amount" id="amount" step="0.01" min="0.01" required>
+    </div>
+    <div class="actions">
+      <button type="submit">Registrar</button>
+    </div>
+  <% end %>
+
+  <h3>Movimentações (mais recentes primeiro)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Data e hora</th>
+        <th>Tipo</th>
+        <th>Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @entries.each do |entry| %>
+        <tr>
+          <td><%= entry.occurred_at.in_time_zone.strftime("%d/%m/%Y %H:%M") %></td>
+          <td><%= entry.credit? ? "Crédito" : "Débito" %></td>
+          <td><%= number_to_currency(entry.amount, unit: "R$ ", separator: ",", delimiter: ".") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="flash flash-alert">Carteira não encontrada.</p>
+<% end %>
+
+<p class="actions">
+  <%= link_to "Editar", edit_user_path(@user) %> ·
+  <%= link_to "Lista", users_path %>
+</p>
