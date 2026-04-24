@@ -8,6 +8,7 @@ storage
 !.env.example
 coverage
 node_modules
+frontend/dist
 *.md
 !README.md
 .cursor
