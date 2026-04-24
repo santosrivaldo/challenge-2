@@ -3,6 +3,7 @@ import type {
   PostTransactionInput,
   Transaction,
   TransactionDateRange,
+  UpdateUserInput,
   UserDetail,
   UserListItem,
 } from '../types/wallet'
@@ -103,9 +104,6 @@ function findUserIndex(id: string): number {
   return users.findIndex((u) => u.id === id)
 }
 
-/**
- * Mock: mirrors future GET users list + search.
- */
 export async function listUsers(query?: string): Promise<UserListItem[]> {
   await delay()
   const q = query ? normalizeQuery(query) : ''
@@ -119,9 +117,6 @@ export async function listUsers(query?: string): Promise<UserListItem[]> {
   return list.map(toListItem)
 }
 
-/**
- * Mock: create user with zero balance (in-memory only).
- */
 export async function createUser(
   input: CreateUserInput,
 ): Promise<UserListItem> {
@@ -144,9 +139,6 @@ export async function createUser(
   return toListItem(row)
 }
 
-/**
- * Mock: user profile + ledger (aligned with wallet entries shape).
- */
 export async function getUser(userId: string): Promise<UserDetail> {
   await delay()
   const idx = findUserIndex(userId)
@@ -154,9 +146,30 @@ export async function getUser(userId: string): Promise<UserDetail> {
   return toDetail(users[idx])
 }
 
-/**
- * Mock: POST wallet transaction; updates balance and appends entry.
- */
+export async function updateUser(
+  userId: string,
+  input: UpdateUserInput,
+): Promise<UserListItem> {
+  await delay()
+  const idx = findUserIndex(userId)
+  if (idx === -1) throw new Error('User not found')
+
+  const name = input.name.trim()
+  const email = input.email.trim().toLowerCase()
+  if (!name) throw new Error('Name is required')
+  if (!email) throw new Error('Email is required')
+
+  const taken = users.some(
+    (u, i) => i !== idx && u.email.toLowerCase() === email,
+  )
+  if (taken) throw new Error('Email already in use')
+
+  const current = users[idx]
+  const updated: InternalUser = { ...current, name, email }
+  users = users.map((u, i) => (i === idx ? updated : u))
+  return toListItem(updated)
+}
+
 export async function postTransaction(
   userId: string,
   input: PostTransactionInput,
@@ -201,9 +214,6 @@ function endOfUtcDay(yyyyMmDd: string): number {
   return new Date(`${yyyyMmDd}T23:59:59.999Z`).getTime()
 }
 
-/**
- * Mock: wallet entries for a user with optional date bounds (UTC day edges).
- */
 export async function listTransactions(
   userId: string,
   range?: TransactionDateRange,
@@ -233,4 +243,3 @@ export async function listTransactions(
       new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime(),
   )
 }
-

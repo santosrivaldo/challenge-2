@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { listTransactions } from '../services/walletApi'
+import { listTransactions } from '../mocks/wallet'
 import type { Transaction, TransactionDateRange } from '../types/wallet'
 
 export function useTransactions(

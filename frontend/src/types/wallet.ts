@@ -25,12 +25,16 @@ export type CreateUserInput = {
   email: string
 }
 
+export type UpdateUserInput = {
+  name: string
+  email: string
+}
+
 export type PostTransactionInput = {
   kind: TransactionKind
   amount: string
 }
 
-/** `from` / `to` are `YYYY-MM-DD` from `<input type="date" />` (optional). */
 export type TransactionDateRange = {
   from?: string
   to?: string

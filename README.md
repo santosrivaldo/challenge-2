@@ -145,7 +145,7 @@ npm run dev
 
 O servidor de desenvolvimento Vite usa por omissão a **porta 5173** (http://localhost:5173).
 
-Por omissão os dados vêm de um **mock em memória** em `frontend/src/services/walletApi.ts`. Para apontar à API Rails real, defina `VITE_API_BASE_URL` (por exemplo `http://localhost:8080/api/v1`) e substitua as implementações mock por `fetch` mantendo os mesmos tipos e assinaturas, para não refatorar páginas e hooks.
+Por omissão os dados vêm de um **mock em memória** em `frontend/src/mocks/wallet.ts`. Para apontar à API Rails real, defina `VITE_API_BASE_URL` (por exemplo `http://localhost:8080/api/v1`) e substitua o conteúdo desse módulo por `fetch`, mantendo os mesmos tipos e assinaturas exportadas.
 
 Se o browser bloquear pedidos por CORS, configure `server.proxy` em [frontend/vite.config.ts](frontend/vite.config.ts) para o host do Rails ou habilite CORS na aplicação Rails.
 
@@ -162,4 +162,4 @@ bin/rails test
 - Serviço: `Wallets::CreditDebitService` (transação com `lock` na carteira)
 - API: `app/controllers/api/v1/users/wallets_controller.rb`
 - Interface web Rails: `UsersController` e vistas em `app/views/users`
-- Interface React (mock): pasta `frontend/` (rotas em `frontend/src/routes.tsx`, serviço mock em `frontend/src/services/walletApi.ts`)
+- Interface React (mock): pasta `frontend/` (rotas em `frontend/src/routes.tsx`, mock em `frontend/src/mocks/wallet.ts`)

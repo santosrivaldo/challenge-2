@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { createUser, listUsers } from '../services/walletApi'
+import { createUser, listUsers } from '../mocks/wallet'
 import type { CreateUserInput, UserListItem } from '../types/wallet'
 
 function useDebouncedValue<T>(value: T, ms: number): T {
