@@ -133,6 +133,22 @@ Se o volume `pgdata` já existia antes deste script de init, apague o volume ou 
 
 Variáveis úteis: `DB_HOST`, `DB_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` (ver [config/database.yml](config/database.yml)).
 
+### Frontend (React)
+
+Interface SaaS de carteira virtual em [frontend/](frontend/) (Vite, React 18, TypeScript, Tailwind). Lista utilizadores, criação, detalhe com crédito/débito, transações com filtro por datas e toasts.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+O servidor de desenvolvimento Vite usa por omissão a **porta 5173** (http://localhost:5173).
+
+Por omissão os dados vêm de um **mock em memória** em `frontend/src/services/walletApi.ts`. Para apontar à API Rails real, defina `VITE_API_BASE_URL` (por exemplo `http://localhost:8080/api/v1`) e substitua as implementações mock por `fetch` mantendo os mesmos tipos e assinaturas, para não refatorar páginas e hooks.
+
+Se o browser bloquear pedidos por CORS, configure `server.proxy` em [frontend/vite.config.ts](frontend/vite.config.ts) para o host do Rails ou habilite CORS na aplicação Rails.
+
 ### Testes
 
 ```bash
@@ -145,4 +161,5 @@ bin/rails test
 - Modelos: `User`, `Wallet`, `WalletEntry`
 - Serviço: `Wallets::CreditDebitService` (transação com `lock` na carteira)
 - API: `app/controllers/api/v1/users/wallets_controller.rb`
-- Interface web: `UsersController` e vistas em `app/views/users`
+- Interface web Rails: `UsersController` e vistas em `app/views/users`
+- Interface React (mock): pasta `frontend/` (rotas em `frontend/src/routes.tsx`, serviço mock em `frontend/src/services/walletApi.ts`)
