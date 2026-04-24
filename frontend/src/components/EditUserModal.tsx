@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { updateUser } from '../mocks/wallet'
+import { updateUser } from '../services/wallet'
 import { Button } from './Button'
 import { Input } from './Input'
 import { Modal } from './Modal'

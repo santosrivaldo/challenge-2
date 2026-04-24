@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import type { TransactionKind } from '../types/wallet'
-import { postTransaction } from '../mocks/wallet'
+import { postTransaction } from '../services/wallet'
 import { Button } from './Button'
 import { Input } from './Input'
 import { Modal } from './Modal'
