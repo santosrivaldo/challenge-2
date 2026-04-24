@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
+import { NotFoundPage } from './pages/NotFoundPage'
 import { TransactionsPage } from './pages/TransactionsPage'
 import { UserDetailPage } from './pages/UserDetailPage'
 import { UsersPage } from './pages/UsersPage'
@@ -14,6 +15,7 @@ export function AppRoutes() {
           path="/users/:id/transactions"
           element={<TransactionsPage />}
         />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   )

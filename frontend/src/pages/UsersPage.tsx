@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Link } from 'react-router-dom'
 import { Button } from '../components/Button'
 import type { Column } from '../components/DataTable'
@@ -56,11 +57,15 @@ export function UsersPage() {
     setSaving(true)
     try {
       await createUser({ name, email })
+      toast.success('User created')
       setCreateOpen(false)
       setName('')
       setEmail('')
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Could not create user')
+      const msg =
+        err instanceof Error ? err.message : 'Could not create user'
+      setFormError(msg)
+      toast.error(msg)
     } finally {
       setSaving(false)
     }
