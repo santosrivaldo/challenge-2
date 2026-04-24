@@ -165,11 +165,6 @@ export function UsersPage() {
           )}
         </form>
       </Modal>
-
-      <p className="mt-8 text-xs text-slate-500">
-        Tip: balances use mock data. Credit / debit flows are on the user detail
-        page.
-      </p>
     </div>
   )
 }

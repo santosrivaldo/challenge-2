@@ -103,9 +103,6 @@ function findUserIndex(id: string): number {
   return users.findIndex((u) => u.id === id)
 }
 
-/**
- * Mock: mirrors future GET users list + search.
- */
 export async function listUsers(query?: string): Promise<UserListItem[]> {
   await delay()
   const q = query ? normalizeQuery(query) : ''
@@ -119,9 +116,6 @@ export async function listUsers(query?: string): Promise<UserListItem[]> {
   return list.map(toListItem)
 }
 
-/**
- * Mock: create user with zero balance (in-memory only).
- */
 export async function createUser(
   input: CreateUserInput,
 ): Promise<UserListItem> {
@@ -144,9 +138,6 @@ export async function createUser(
   return toListItem(row)
 }
 
-/**
- * Mock: user profile + ledger (aligned with wallet entries shape).
- */
 export async function getUser(userId: string): Promise<UserDetail> {
   await delay()
   const idx = findUserIndex(userId)
@@ -154,9 +145,6 @@ export async function getUser(userId: string): Promise<UserDetail> {
   return toDetail(users[idx])
 }
 
-/**
- * Mock: POST wallet transaction; updates balance and appends entry.
- */
 export async function postTransaction(
   userId: string,
   input: PostTransactionInput,
@@ -201,9 +189,6 @@ function endOfUtcDay(yyyyMmDd: string): number {
   return new Date(`${yyyyMmDd}T23:59:59.999Z`).getTime()
 }
 
-/**
- * Mock: wallet entries for a user with optional date bounds (UTC day edges).
- */
 export async function listTransactions(
   userId: string,
   range?: TransactionDateRange,
@@ -233,4 +218,3 @@ export async function listTransactions(
       new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime(),
   )
 }
-

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getUser } from '../services/walletApi'
+import { getUser } from '../mocks/wallet'
 import type { UserDetail } from '../types/wallet'
 
 export function useUser(userId: string | undefined) {
