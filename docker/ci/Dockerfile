@@ -1,12 +1,17 @@
 FROM ruby:3.2-slim-bookworm
 
-RUN apt-get update -qq \
-  && apt-get install -y --no-install-recommends \
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN set -eux; \
+  apt-get update --allow-releaseinfo-change \
+    -o Acquire::Retries=5 \
+    -o Acquire::http::Timeout=120; \
+  apt-get install -y --no-install-recommends \
     build-essential \
     curl \
     libpq-dev \
-    postgresql-client \
-  && rm -rf /var/lib/apt/lists/*
+    postgresql-client; \
+  rm -rf /var/lib/apt/lists/*
 
 RUN adduser --system --group --uid 1000 --home /home/rails rails
 

@@ -80,6 +80,14 @@ Para personalizar variáveis, copie [.env.example](.env.example) para `.env`, aj
 
 Para popular dados de exemplo: `docker compose exec web bundle exec rails db:seed`.
 
+Se o build da imagem `web` (ou `ci`) falhar em `apt-get` (código 100), volte a construir com log plano para ver `Failed to fetch`, DNS ou timeout:
+
+```bash
+docker compose build --progress=plain web
+```
+
+Em seguida verifique rede/VPN, DNS do Docker Desktop ou proxy `HTTP_PROXY`/`HTTPS_PROXY` no ambiente de build.
+
 ### CI/CD no Docker Compose
 
 Serviços adicionais (perfis Compose) para encaixar num pipeline sem alterar o arranque normal (`docker compose up` continua a subir apenas `db`, `web` e `proxy`).
