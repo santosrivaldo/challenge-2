@@ -1,0 +1,16 @@
+.git
+.gitignore
+log
+tmp
+storage
+.env
+.env.*
+!.env.example
+coverage
+node_modules
+*.md
+!README.md
+.cursor
+mcps
+vendor/bundle
+.bundle
