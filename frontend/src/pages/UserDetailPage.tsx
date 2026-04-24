@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
+import { EditUserModal } from '../components/EditUserModal'
 import { PageHeader } from '../components/PageHeader'
 import { Spinner } from '../components/Spinner'
 import { TransactionModal } from '../components/TransactionModal'
@@ -14,11 +15,18 @@ export function UserDetailPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalKind, setModalKind] = useState<TransactionKind>('credit')
   const [modalNonce, setModalNonce] = useState(0)
+  const [editOpen, setEditOpen] = useState(false)
+  const [editNonce, setEditNonce] = useState(0)
 
   function openModal(kind: TransactionKind) {
     setModalKind(kind)
     setModalNonce((n) => n + 1)
     setModalOpen(true)
+  }
+
+  function openEdit() {
+    setEditNonce((n) => n + 1)
+    setEditOpen(true)
   }
 
   if (!id) {
@@ -46,7 +54,15 @@ export function UserDetailPage() {
       ) : user ? (
         <>
           <div className="grid gap-6 lg:grid-cols-3">
-            <Card className="lg:col-span-2" title="Profile">
+            <Card className="lg:col-span-2">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+                  Profile
+                </h2>
+                <Button type="button" variant="ghost" size="sm" onClick={openEdit}>
+                  Edit profile
+                </Button>
+              </div>
               <dl className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
@@ -100,6 +116,18 @@ export function UserDetailPage() {
             defaultKind={modalKind}
             onClose={() => setModalOpen(false)}
             onCompleted={() => {
+              void refetch()
+            }}
+          />
+
+          <EditUserModal
+            key={`${user.id}-edit-${editNonce}`}
+            open={editOpen}
+            userId={user.id}
+            initialName={user.name}
+            initialEmail={user.email}
+            onClose={() => setEditOpen(false)}
+            onSaved={() => {
               void refetch()
             }}
           />

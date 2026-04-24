@@ -3,6 +3,7 @@ import type {
   PostTransactionInput,
   Transaction,
   TransactionDateRange,
+  UpdateUserInput,
   UserDetail,
   UserListItem,
 } from '../types/wallet'
@@ -143,6 +144,30 @@ export async function getUser(userId: string): Promise<UserDetail> {
   const idx = findUserIndex(userId)
   if (idx === -1) throw new Error('User not found')
   return toDetail(users[idx])
+}
+
+export async function updateUser(
+  userId: string,
+  input: UpdateUserInput,
+): Promise<UserListItem> {
+  await delay()
+  const idx = findUserIndex(userId)
+  if (idx === -1) throw new Error('User not found')
+
+  const name = input.name.trim()
+  const email = input.email.trim().toLowerCase()
+  if (!name) throw new Error('Name is required')
+  if (!email) throw new Error('Email is required')
+
+  const taken = users.some(
+    (u, i) => i !== idx && u.email.toLowerCase() === email,
+  )
+  if (taken) throw new Error('Email already in use')
+
+  const current = users[idx]
+  const updated: InternalUser = { ...current, name, email }
+  users = users.map((u, i) => (i === idx ? updated : u))
+  return toListItem(updated)
 }
 
 export async function postTransaction(
