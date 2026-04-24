@@ -48,6 +48,16 @@ services:
     networks:
       - app
 
+  frontend:
+    image: walletapp-frontend:latest
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api/v1}
+    networks:
+      - app
+
   proxy:
     build:
       context: .
@@ -56,6 +66,7 @@ services:
       - "8080:8080"
     depends_on:
       - web
+      - frontend
     networks:
       - app
 
