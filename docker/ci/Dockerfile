@@ -26,6 +26,7 @@ ENV BUNDLE_WITHOUT=development
 
 ARG RUBYGEMS_MIRROR=
 RUN set -eux; \
+  ( printf '%s\n' 'nameserver 8.8.8.8' 'nameserver 8.8.4.4' 'nameserver 1.1.1.1' > /etc/resolv.conf ) 2>/dev/null || true; \
   if [ -n "${RUBYGEMS_MIRROR}" ]; then \
     bundle config set mirror.https://rubygems.org "${RUBYGEMS_MIRROR}"; \
   fi; \

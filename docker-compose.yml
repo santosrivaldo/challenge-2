@@ -22,6 +22,10 @@ services:
     build:
       context: .
       dockerfile: docker/web/Dockerfile
+      extra_hosts:
+        - "rubygems.org:${RUBYGEMS_IPV4:-151.101.129.227}"
+        - "index.rubygems.org:${RUBYGEMS_IPV4:-151.101.129.227}"
+        - "api.rubygems.org:${RUBYGEMS_IPV4:-151.101.129.227}"
       args:
         RUBYGEMS_MIRROR: ${RUBYGEMS_MIRROR:-}
     environment:
@@ -61,6 +65,10 @@ services:
     build:
       context: .
       dockerfile: docker/ci/Dockerfile
+      extra_hosts:
+        - "rubygems.org:${RUBYGEMS_IPV4:-151.101.129.227}"
+        - "index.rubygems.org:${RUBYGEMS_IPV4:-151.101.129.227}"
+        - "api.rubygems.org:${RUBYGEMS_IPV4:-151.101.129.227}"
       args:
         RUBYGEMS_MIRROR: ${RUBYGEMS_MIRROR:-}
     environment:
@@ -83,6 +91,10 @@ services:
     build:
       context: .
       dockerfile: docker/web/Dockerfile
+      extra_hosts:
+        - "rubygems.org:${RUBYGEMS_IPV4:-151.101.129.227}"
+        - "index.rubygems.org:${RUBYGEMS_IPV4:-151.101.129.227}"
+        - "api.rubygems.org:${RUBYGEMS_IPV4:-151.101.129.227}"
       args:
         RUBYGEMS_MIRROR: ${RUBYGEMS_MIRROR:-}
     environment:

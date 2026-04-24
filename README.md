@@ -90,8 +90,10 @@ Em seguida verifique rede/VPN, DNS do Docker Desktop ou proxy `HTTP_PROXY`/`HTTP
 
 O projeto inclui [Gemfile.lock](Gemfile.lock) no repositório; o `bundle install` na imagem continua a precisar de alcançar **rubygems.org** (ou um espelho). Se aparecer `Could not reach host index.rubygems.org` ou erro de DNS no passo do Bundler:
 
-1. No Docker Desktop, defina DNS público (por exemplo 8.8.8.8) nas definições do daemon ou corrija firewall/VPN.
-2. Opcional: use um espelho Rubygems via variável de ambiente (ver [.env.example](.env.example); o Compose repassa-a como build-arg):
+1. O [docker-compose.yml](docker-compose.yml) define `build.extra_hosts` para `rubygems.org`, `index.rubygems.org` e `api.rubygems.org` com um endereço IPv4 da rede Fastly (predefinido `151.101.129.227`), para contornar falhas de DNS do daemon. Pode sobrepor com `RUBYGEMS_IPV4` no ambiente ou no `.env` (ver [.env.example](.env.example)); atualize o IP com `nslookup rubygems.org 8.8.8.8` se o build falhar por TLS ou conexão.
+2. O Dockerfile tenta ainda gravar `nameserver 8.8.8.8` em `/etc/resolv.conf` antes do Bundler (ignorado se o ficheiro for só de leitura).
+3. No Docker Desktop, defina DNS público nas definições do daemon ou corrija firewall/VPN.
+4. Opcional: use um espelho Rubygems via variável de ambiente (o Compose repassa-a como build-arg):
 
 ```powershell
 $env:RUBYGEMS_MIRROR="https://URL-DO-ESPELHO"
@@ -99,6 +101,8 @@ docker compose build web
 ```
 
 (O URL deve ser o que a tua equipa ou o fornecedor do espelho indica para substituir `https://rubygems.org` no Bundler.)
+
+Use `docker compose build` (e não só `docker build` na pasta `docker`) para aplicar os `extra_hosts` do Compose.
 
 O Dockerfile define `BUNDLE_RETRY` e `BUNDLE_TIMEOUT` e instala `libyaml-dev` para compilações nativas (por exemplo `psych`).
 
