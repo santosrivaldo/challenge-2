@@ -88,6 +88,20 @@ docker compose build --progress=plain web
 
 Em seguida verifique rede/VPN, DNS do Docker Desktop ou proxy `HTTP_PROXY`/`HTTPS_PROXY` no ambiente de build.
 
+O projeto inclui [Gemfile.lock](Gemfile.lock) no repositório; o `bundle install` na imagem continua a precisar de alcançar **rubygems.org** (ou um espelho). Se aparecer `Could not reach host index.rubygems.org` ou erro de DNS no passo do Bundler:
+
+1. No Docker Desktop, defina DNS público (por exemplo 8.8.8.8) nas definições do daemon ou corrija firewall/VPN.
+2. Opcional: use um espelho Rubygems via variável de ambiente (ver [.env.example](.env.example); o Compose repassa-a como build-arg):
+
+```powershell
+$env:RUBYGEMS_MIRROR="https://URL-DO-ESPELHO"
+docker compose build web
+```
+
+(O URL deve ser o que a tua equipa ou o fornecedor do espelho indica para substituir `https://rubygems.org` no Bundler.)
+
+O Dockerfile define `BUNDLE_RETRY` e `BUNDLE_TIMEOUT` e instala `libyaml-dev` para compilações nativas (por exemplo `psych`).
+
 ### CI/CD no Docker Compose
 
 Serviços adicionais (perfis Compose) para encaixar num pipeline sem alterar o arranque normal (`docker compose up` continua a subir apenas `db`, `web` e `proxy`).
