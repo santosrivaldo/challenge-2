@@ -1,0 +1,25 @@
+<%= form_with model: @user do |f| %>
+  <% if @user.errors.any? %>
+    <div class="flash flash-alert">
+      <ul>
+        <% @user.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "Nome" %>
+    <%= f.text_field :name %>
+  </div>
+
+  <div>
+    <%= f.label :email, "E-mail" %>
+    <%= f.email_field :email %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

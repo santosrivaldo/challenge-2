@@ -1,0 +1,22 @@
+<h1>Usuários</h1>
+
+<p class="actions"><%= link_to "Novo usuário", new_user_path %></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>E-mail</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @users.each do |user| %>
+      <tr>
+        <td><%= user.name %></td>
+        <td><%= user.email %></td>
+        <td><%= link_to "Detalhes", user_path(user) %> · <%= link_to "Editar", edit_user_path(user) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

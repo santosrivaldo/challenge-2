@@ -1,0 +1,27 @@
+FROM ruby:3.2-slim-bookworm
+
+RUN apt-get update -qq \
+  && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    libpq-dev \
+    postgresql-client \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN adduser --system --group --uid 1000 --home /home/rails rails
+
+WORKDIR /app
+
+COPY Gemfile ./
+ENV BUNDLE_WITHOUT=development
+RUN bundle install --jobs 4 --retry 3 \
+  && chown -R rails:rails /usr/local/bundle
+
+COPY . .
+RUN chmod +x docker/ci/entrypoint.sh \
+  && chown -R rails:rails /app
+
+USER rails
+
+ENTRYPOINT ["/app/docker/ci/entrypoint.sh"]
+CMD ["bundle", "exec", "rails", "test"]
