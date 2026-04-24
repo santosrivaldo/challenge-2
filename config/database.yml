@@ -1,0 +1,19 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i %>
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
+  port: <%= ENV.fetch("DB_PORT", 5432).to_i %>
+  username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD", "postgres") %>
+
+development:
+  <<: *default
+  database: <%= ENV.fetch("POSTGRES_DB", "wallet_app_development") %>
+
+test:
+  <<: *default
+  database: wallet_app_test
+
+production:
+  url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@db:5432/wallet_app_production") %>
