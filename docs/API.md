@@ -81,3 +81,60 @@ curl -s "http://localhost:8080/api/v1/users/1/wallet/balance"
 ```bash
 curl -s "http://localhost:8080/api/v1/users/1/wallet/entries?from=2026-04-01T00:00:00Z&to=2026-04-30T23:59:59Z"
 ```
+
+## 4. Listar utilizadores
+
+`GET /api/v1/users`
+
+**Resposta `200`**: array JSON, cada elemento com `id`, `name`, `email`, `balance` (string com duas casas decimais, soma da carteira).
+
+**Exemplo cURL**
+
+```bash
+curl -s "http://localhost:8080/api/v1/users"
+```
+
+## 5. Criar utilizador
+
+`POST /api/v1/users`
+
+**Corpo (JSON)**
+
+```json
+{
+  "name": "Maria",
+  "email": "maria@example.com"
+}
+```
+
+**Respostas**
+
+- `201 Created`: objeto com `id`, `name`, `email`, `balance` (carteira criada automaticamente com saldo `0.00`).
+- `422 Unprocessable Entity`: `{ "error": "..." }` (validação ou email duplicado).
+
+## 6. Detalhe de utilizador
+
+`GET /api/v1/users/:id`
+
+**Resposta `200`**: `{ "id", "name", "email", "balance" }`
+
+- `404 Not Found`: `{ "error": "utilizador não encontrado" }`
+
+## 7. Atualizar utilizador
+
+`PATCH /api/v1/users/:id`
+
+**Corpo (JSON)** (campos opcionais conforme envio)
+
+```json
+{
+  "name": "Maria Silva",
+  "email": "maria.silva@example.com"
+}
+```
+
+**Respostas**
+
+- `200 OK`: objeto atualizado (`id`, `name`, `email`, `balance`).
+- `422 Unprocessable Entity`: `{ "error": "..." }`
+- `404 Not Found`: igual ao detalhe.
