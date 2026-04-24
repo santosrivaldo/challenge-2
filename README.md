@@ -73,7 +73,7 @@ Consulte [docs/API.md](docs/API.md) para os três endpoints JSON com exemplos `c
 ### Executar com Docker Compose
 
 1. Na raiz do projeto: `docker compose up --build` (credenciais de desenvolvimento já estão definidas em [docker-compose.yml](docker-compose.yml); **altere-as antes de qualquer ambiente exposto à Internet**).
-2. A interface web e a API ficam atrás do proxy em **http://localhost:8080**.
+2. O proxy em **http://localhost:8080** encaminha **`/`** para a SPA React (imagem [docker/frontend/Dockerfile](docker/frontend/Dockerfile), build estático com Nginx) e **`/api/`** para a aplicação Rails (`web`). A UI Rails em HTML deixa de estar na raiz pública quando usas este proxy; a API JSON continua em `/api/v1/...` (ver [docs/API.md](docs/API.md)).
 3. Migrações e `db:prepare` são executadas pelo entrypoint do serviço `web` após o Postgres ficar saudável.
 
 Para personalizar variáveis, copie [.env.example](.env.example) para `.env`, ajuste os valores e use `docker compose --env-file .env up --build` (requer alinhar substituições no `docker-compose.yml` ou duplicar as chaves em `environment:`).
@@ -108,7 +108,7 @@ O Dockerfile define `BUNDLE_RETRY` e `BUNDLE_TIMEOUT` e instala `libyaml-dev` pa
 
 ### CI/CD no Docker Compose
 
-Serviços adicionais (perfis Compose) para encaixar num pipeline sem alterar o arranque normal (`docker compose up` continua a subir apenas `db`, `web` e `proxy`).
+Serviços adicionais (perfis Compose) para encaixar num pipeline sem alterar o arranque normal (`docker compose up` sobe `db`, `web`, `frontend` e `proxy`).
 
 | Serviço | Perfil | Função |
 |---------|--------|--------|
@@ -145,9 +145,11 @@ npm run dev
 
 O servidor de desenvolvimento Vite usa por omissão a **porta 5173** (http://localhost:5173).
 
-Por omissão os dados vêm de um **mock em memória** em `frontend/src/mocks/wallet.ts`. Para apontar à API Rails real, defina `VITE_API_BASE_URL` (por exemplo `http://localhost:8080/api/v1`) e substitua o conteúdo desse módulo por `fetch`, mantendo os mesmos tipos e assinaturas exportadas.
+**Mock vs API:** sem variáveis de ambiente, a SPA usa o mock em [frontend/src/mocks/wallet.ts](frontend/src/mocks/wallet.ts). Com **`VITE_API_BASE_URL=/api/v1`** (valor relativo recomendado), as chamadas passam por [frontend/src/services/wallet.ts](frontend/src/services/wallet.ts) para a API documentada em [docs/API.md](docs/API.md) (utilizadores + carteira). Copie [frontend/.env.example](frontend/.env.example) para `frontend/.env` e descomente a linha `VITE_API_BASE_URL` quando quiser dados reais (é preciso Postgres com migrações/seed).
 
-Se o browser bloquear pedidos por CORS, configure `server.proxy` em [frontend/vite.config.ts](frontend/vite.config.ts) para o host do Rails ou habilite CORS na aplicação Rails.
+**Proxy em desenvolvimento:** o [frontend/vite.config.ts](frontend/vite.config.ts) encaminha o prefixo `/api` para `VITE_PROXY_TARGET` (predefinição `http://127.0.0.1:8080`, ou seja o Nginx do Compose). Se correr só o Rails em `localhost:3000`, use `VITE_PROXY_TARGET=http://127.0.0.1:3000`.
+
+**Docker:** a imagem `frontend` aceita build-arg `VITE_API_BASE_URL` (predefinição `/api/v1` no [docker-compose.yml](docker-compose.yml)) para embutir a URL no bundle de produção atrás do proxy na porta 8080.
 
 ### Testes
 
@@ -160,6 +162,6 @@ bin/rails test
 
 - Modelos: `User`, `Wallet`, `WalletEntry`
 - Serviço: `Wallets::CreditDebitService` (transação com `lock` na carteira)
-- API: `app/controllers/api/v1/users/wallets_controller.rb`
+- API: `app/controllers/api/v1/users_controller.rb`, `app/controllers/api/v1/users/wallets_controller.rb`
 - Interface web Rails: `UsersController` e vistas em `app/views/users`
-- Interface React (mock): pasta `frontend/` (rotas em `frontend/src/routes.tsx`, mock em `frontend/src/mocks/wallet.ts`)
+- Interface React: pasta `frontend/` (rotas em `frontend/src/routes.tsx`, fachada `frontend/src/services/wallet.ts`, mock `frontend/src/mocks/wallet.ts`)
